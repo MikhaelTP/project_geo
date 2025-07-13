@@ -9,6 +9,8 @@ import RoutesPage from './RoutesPage';
 import ReportsPage from './ReportsPage';
 import AlertsPage from './AlertsPage';
 import SettingsPage from './SettingsPage';
+import AdminPage from './AdminPage';
+import EventsConfigurationPage from './EventsConfigurationPage';
 import VehicleDetailsModal from '../components/vehicles/VehicleDetailsModal';
 import { 
   Navigation, 
@@ -25,12 +27,16 @@ import {
   Car,
   Route,
   FileText,
-  Settings
+  Settings,
+  Shield,
+  Zap
 } from 'lucide-react';
+
 const MainLayout = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [userRole, setUserRole] = useState('administrador'); // Simular rol del usuario
 
   const tabs = [
     { id: 'dashboard', name: 'Dashboard', icon: BarChart3 },
@@ -38,8 +44,10 @@ const MainLayout = () => {
     { id: 'vehicles', name: 'Vehículos', icon: Car },
     { id: 'routes', name: 'Rutas', icon: Route },
     { id: 'reports', name: 'Reportes', icon: FileText },
-    { id: 'alerts', name: 'Alertas', icon: Bell },
-    { id: 'settings', name: 'Configuración', icon: Settings }
+    { id: 'events', name: 'Eventos', icon: Zap },
+    { id: 'settings', name: 'Configuración', icon: Settings },
+    // Solo mostrar el tab de administración si el usuario es administrador
+    ...(userRole === 'administrador' ? [{ id: 'admin', name: 'Administración', icon: Shield }] : [])
   ];
 
   const renderActiveTab = () => {
@@ -50,14 +58,16 @@ const MainLayout = () => {
       case 'routes': return <RoutesPage />;
       case 'reports': return <ReportsPage />;
       case 'alerts': return <AlertsPage notifications={notifications} />;
+      case 'events': return <EventsConfigurationPage />;
       case 'settings': return <SettingsPage />;
+      case 'admin': return userRole === 'administrador' ? <AdminPage /> : <DashboardPage setSelectedVehicle={setSelectedVehicle} />;
       default: return <DashboardPage setSelectedVehicle={setSelectedVehicle} />;
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header notifications={notifications} />
+      <Header notifications={notifications} userRole={userRole} />
       <NavigationTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
